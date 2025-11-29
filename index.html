@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayurvedic Dosha Balance Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #4a90e2;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .question {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .question h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .option {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .option:hover {
+            border-color: #4a90e2;
+            background: #f0f8ff;
+        }
+
+        .option.selected {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }
+
+        .progress {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .calculate-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            font-size: 1.1em;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .calculate-btn:hover:not(:disabled) {
+            background: #357abd;
+        }
+
+        .calculate-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .results {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            background: #f0f8ff;
+            border-radius: 8px;
+            border: 1px solid #4a90e2;
+            text-align: center;
+        }
+
+        .dominant-dosha {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .vata-highlight {
+            background: linear-gradient(135deg, #a8e6cf, #dcedc1);
+            color: #2d5a27;
+        }
+
+        .pitta-highlight {
+            background: linear-gradient(135deg, #ffd89b, #19547b);
+            color: #fff;
+        }
+
+        .kapha-highlight {
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            color: #72142c;
+        }
+
+        .dosha-info {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .dosha-info h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .dosha-info ul {
+            text-align: left;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .dosha-info li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dosha-info li:last-child {
+            border-bottom: none;
+        }
+
+        .cures {
+            margin-top: 25px;
+        }
+
+        .cures h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .cure-item {
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #4a90e2;
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .restart-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 1em;
+        }
+
+        .restart-btn:hover {
+            background: #218838;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .dominant-dosha {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Ayurvedic Dosha Balance</h1>
+            <p>Created By Group-11 Div-F <br>
+            Under Guidence of Rutuja Karad Ma'am</p>
+        </div>
+
+        <div class="content">
+            <div class="progress" id="progress">
+                Completed 0 of 12 questions
+            </div>
+
+            <div id="quiz-section">
+                <div class="question" id="question-0">
+                    <h3>1. Body frame?</h3>
+                    <div class="options">
+                        <div class="option" data-vata="3">Thin</div>
+                        <div class="option" data-pitta="3">Medium</div>
+                        <div class="option" data-kapha="3">Large</div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-1">
+                    <h3>2. Skin type?</h3>
+                    <div class="options">
+                        <div class="option" data-vata="3">Dry</div>
+                        <div class="option" data-pitta="3">Oily</div>
+                        <div class="option" data-kapha="3">Smooth</div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-2">
+                    <h3>3. Hair type?</h3>
+                    <div class="options">
+                        <div class="option" data-vata="3">Thin/Dry</div>
+                        <div class="option" data-pitta="3">Fine/Straight</div>
+                        <div class="option" data-kapha="3">Thick/Wavy</div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-3">
+                    <h3>4. Cold weather tolerance?</h3>
+                    <div class="options">
+                        <div class="option" data-vata="3">Dislike</div>
+                        <div class="option" data-pitta="3">Okay</div>
+                        <div class="option" data-kapha="3">Tolerate</div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-4">
+                    <h3>5. Sleep pattern?</h3>
+                    <div class="options">
+                        <div class="option" data-vata="3">Light</div>
+                        <div class="option" data-pitta="3">Moderate</div>
+                        <div class="option" data-kapha="3">Deep</div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-5">
+                    <h3>6. Walking speed?</h3>
+                    <div class="options">
+                        <div class="option" data-vata="3">Fast</div>
+                        <div class="option" data-pitta="3">Medium</div>
+                        <div class="option" data-kapha="3">Slow</div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-6">
+                    <h3>7. Energy pattern?</h3>
+                    <div class="options">
+                        <div class="option" data-vata="3">High</div>
+                        <div class="option" data-pitta="3">Steady</div>
+                        <div class="option" data-kapha="3">Low</div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-7">
+                    <h3>8. Stress response?</h3>
+                    <div class="options">
+                        <div class="option" data-vata="3">Anxious</div>
+                        <div class="option" data-pitta="3">Angry</div>
+                        <div class="option" data-kapha="3">Withdrawn</div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-8">
+                    <h3>9. Memory type?</h3>
+                    <div class="options">
+                        <div class="option" data-vata="3">Quick forget</div>
+                        <div class="option" data-pitta="3">Sharp</div>
+                        <div class="option" data-kapha="3">Slow retain</div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-9">
+                    <h3>10. Speech pattern?</h3>
+                    <div class="options">
+                        <div class="option" data-vata="3">Fast</div>
+                        <div class="option" data-pitta="3">Precise</div>
+                        <div class="option" data-kapha="3">Slow</div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-10">
+                    <h3>11. Preferred weather?</h3>
+                    <div class="options">
+                        <div class="option" data-vata="3">Warm dry</div>
+                        <div class="option" data-pitta="3">Cool</div>
+                        <div class="option" data-kapha="3">Warm humid</div>
+                    </div>
+                </div>
+
+                <div class="question" id="question-11">
+                    <h3>12. Decision making?</h3>
+                    <div class="options">
+                        <div class="option" data-vata="3">Quick change</div>
+                        <div class="option" data-pitta="3">Decisive</div>
+                        <div class="option" data-kapha="3">Slow steady</div>
+                    </div>
+                </div>
+
+                <button class="calculate-btn" id="calculate-btn" onclick="calculateResults()" disabled>
+                    Calculate My Dosha
+                </button>
+            </div>
+
+            <div id="results-section" class="results">
+                <div class="dominant-dosha" id="dominant-dosha">VATA</div>
+                <p id="result-description" style="font-size: 1.2em; margin-bottom: 25px;"></p>
+                
+                <div class="dosha-info" id="dosha-info">
+                    <h3>YOUR DOSHA CHARACTERISTICS</h3>
+                    <ul id="dosha-characteristics"></ul>
+                </div>
+
+                <div class="cures">
+                    <h3>RECOMMENDED BALANCING PRACTICES</h3>
+                    <div id="cures-list"></div>
+                </div>
+
+                <button class="restart-btn" onclick="restartQuiz()">Take Quiz Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let scores = { vata: 0, pitta: 0, kapha: 0 };
+        let answeredQuestions = 0;
+        const totalQuestions = 12;
+
+        // Add click handlers to all options
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const options = this.parentNode.querySelectorAll('.option');
+                options.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                scores.vata += parseInt(this.dataset.vata || 0);
+                scores.pitta += parseInt(this.dataset.pitta || 0);
+                scores.kapha += parseInt(this.dataset.kapha || 0);
+                
+                answeredQuestions++;
+                updateProgress();
+                updateCalculateButton();
+            });
+        });
+
+        function updateProgress() {
+            document.getElementById('progress').textContent = 
+                `Completed ${answeredQuestions} of ${totalQuestions} questions`;
+        }
+
+        function updateCalculateButton() {
+            const btn = document.getElementById('calculate-btn');
+            btn.disabled = answeredQuestions < totalQuestions;
+        }
+
+        function calculateResults() {
+            document.getElementById('quiz-section').style.display = 'none';
+            document.getElementById('results-section').style.display = 'block';
+
+            const doshas = ['vata', 'pitta', 'kapha'];
+            const dominant = doshas.reduce((a, b) => scores[a] > scores[b] ? a : b);
+
+            // Highlight dominant dosha
+            document.getElementById('dominant-dosha').textContent = dominant.toUpperCase();
+            document.getElementById('dominant-dosha').className = `dominant-dosha ${dominant}-highlight`;
+
+            // Description
+            const descriptions = {
+                vata: "Your primary energy is VATA - Air & Ether elements dominate your constitution.",
+                pitta: "Your primary energy is PITTA - Fire & Water elements dominate your constitution.",
+                kapha: "Your primary energy is KAPHA - Water & Earth elements dominate your constitution."
+            };
+            document.getElementById('result-description').textContent = descriptions[dominant];
+
+            // Detailed characteristics
+            showDoshaInfo(dominant);
+            showCures(dominant);
+        }
+
+        function showDoshaInfo(dominant) {
+            const info = {
+                vata: [
+                    "Light, thin build with prominent joints",
+                    "Dry skin and hair, cold hands/feet",
+                    "Quick movements, enthusiastic talker",
+                    "Creative mind, quick to learn/forget",
+                    "Variable appetite and energy levels",
+                    "Tendency toward anxiety when stressed",
+                    "Light sleep, wakes easily"
+                ],
+                pitta: [
+                    "Medium athletic build, well-proportioned",
+                    "Warm skin, often oily or combination",
+                    "Sharp intellect, precise speech",
+                    "Strong willpower and leadership qualities",
+                    "Intense focus, good medium-term memory",
+                    "Gets irritable under pressure",
+                    "Moderate consistent sleep pattern"
+                ],
+                kapha: [
+                    "Solid sturdy build, strong physique",
+                    "Smooth soft skin, thick lustrous hair",
+                    "Slow steady movements and speech",
+                    "Excellent long-term memory",
+                    "Calm temperament, slow to anger",
+                    "Deep sound sleep, slow to wake",
+                    "Steady reliable endurance"
+                ]
+            };
+
+            const characteristicsList = document.getElementById('dosha-characteristics');
+            characteristicsList.innerHTML = '';
+            info[dominant].forEach(characteristic => {
+                const li = document.createElement('li');
+                li.textContent = characteristic;
+                characteristicsList.appendChild(li);
+            });
+        }
+
+        function showCures(dominant) {
+            const cures = {
+                vata: [
+                    "Warm cooked nourishing foods daily",
+                    "Regular gentle yoga and meditation",
+                    "Daily warm oil self-massage (abhyanga)",
+                    "Consistent daily routine and schedule",
+                    "Warm sweet herbal teas regularly"
+                ],
+                pitta: [
+                    "Cooling sweet and bitter foods",
+                    "Regular cooling showers or swims",
+                    "Moon salutations in evening practice",
+                    "Spend time in calming natural settings",
+                    "Sweet dairy and cooling herbs (mint)"
+                ],
+                kapha: [
+                    "Bitter pungent spicy seasonings",
+                    "Daily vigorous aerobic exercise",
+                    "Early morning rising with sunlight",
+                    "Breath of fire pranayama practice",
+                    "Dry brushing and stimulating massage"
+                ]
+            };
+
+            const curesList = document.getElementById('cures-list');
+            curesList.innerHTML = '';
+            cures[dominant].forEach(cure => {
+                const div = document.createElement('div');
+                div.className = 'cure-item';
+                div.textContent = cure;
+                curesList.appendChild(div);
+            });
+        }
+
+        function restartQuiz() {
+            scores = { vata: 0, pitta: 0, kapha: 0 };
+            answeredQuestions = 0;
+            
+            document.getElementById('quiz-section').style.display = 'block';
+            document.getElementById('results-section').style.display = 'none';
+            
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            updateProgress();
+            updateCalculateButton();
+        }
+    </script>
+</body>
+</html>
